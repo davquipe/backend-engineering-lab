@@ -9,7 +9,11 @@ Status: In progress
 
 ## Evidence
 
-Pending implementation and review.
+- HTTP server implemented.
+- Health endpoint tested.
+- Service metadata endpoint implemented.
+- Automated HTTP contract tests added.
+- Code review pending.
 
 ## Blockers
 

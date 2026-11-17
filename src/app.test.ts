@@ -45,4 +45,27 @@ test('HTTP API contract', async (t) => {
 
 		assert.equal(response.status, 404)
 	})
+
+	await t.test('GET /v1/info returns 200', async () => {
+		const response = await fetch(`${baseUrl}/v1/info`)
+
+		assert.equal(response.status, 200)
+		assert.deepEqual(await response.json(), {
+			name: 'serviceops-api',
+			version: '1.0.0',
+			environment: 'development',
+		})
+	})
+
+	await t.test('POST /v1/info returns 405', async () => {
+		const response = await fetch(`${baseUrl}/v1/info`, {
+			method: 'POST',
+		})
+
+		assert.equal(response.status, 405)
+		assert.equal(response.headers.get('allow'), 'GET')
+		assert.deepEqual(await response.json(), {
+			error: 'METHOD_NOT_ALLOWED',
+		})
+	})
 })
