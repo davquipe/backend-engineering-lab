@@ -18,6 +18,22 @@ export function createApp() {
 			return
 		}
 
+		if (path === '/v1/info') {
+			if (request.method !== 'GET') {
+				response.writeHead(405, { Allow: 'GET' })
+				response.end(JSON.stringify({ error: 'METHOD_NOT_ALLOWED' }))
+				return
+			}
+
+			response.writeHead(200)
+			response.end(JSON.stringify({
+				name: 'serviceops-api',
+				version: '1.0.0',
+				environment: 'development',
+			}))
+			return
+		}
+
 		response.writeHead(404)
 		response.end(JSON.stringify({ error: 'NOT_FOUND' }))
 	})
