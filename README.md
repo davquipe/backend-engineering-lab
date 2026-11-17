@@ -21,3 +21,5 @@ npm test
 
 GET /health - Service health
 GET /v1/info - Service metadata
+GET /v1/tickets - List tickets
+POST /v1/tickets - Create ticket

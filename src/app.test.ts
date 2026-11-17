@@ -74,4 +74,100 @@ test('HTTP API contract', async (t) => {
 			error: 'METHOD_NOT_ALLOWED',
 		})
 	})
+
+	await t.test('GET /v1/tickets returns an empty list', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`)
+
+		assert.equal(response.status, 200)
+		assert.deepEqual(await response.json(), {
+			data: [],
+		})
+	})
+
+	await t.test('POST /v1/tickets creates a ticket', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				title: 'Error al iniciar sesión',
+			}),
+		})
+
+		assert.equal(response.status, 201)
+
+		const ticket: unknown = await response.json()
+
+		assert.ok(
+			typeof ticket === 'object' &&
+				ticket !== null &&
+				'id' in ticket &&
+				typeof ticket.id === 'string',
+		)
+
+		assert.deepEqual(
+			{
+				title: 'title' in ticket ? ticket.title : undefined,
+				status: 'status' in ticket ? ticket.status : undefined,
+			},
+			{
+				title: 'Error al iniciar sesión',
+				status: 'open',
+			},
+		)
+	})
+
+	await t.test('GET /v1/tickets lists created tickets', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`)
+
+		assert.equal(response.status, 200)
+
+		const result: unknown = await response.json()
+
+		assert.ok(
+			typeof result === 'object' &&
+				result !== null &&
+				'data' in result &&
+				Array.isArray(result.data),
+		)
+
+		assert.equal(result.data.length, 1)
+	})
+
+	await t.test('POST /v1/tickets validates title', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ title: 42 }),
+		})
+
+		assert.equal(response.status, 422)
+		assert.deepEqual(await response.json(), {
+			error: 'VALIDATION_ERROR',
+		})
+	})
+
+	await t.test('POST /v1/tickets rejects malformed JSON', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: '{"title":',
+		})
+
+		assert.equal(response.status, 400)
+	})
+
+	await t.test('PUT /v1/tickets returns 405', async () => {
+		const response = await fetch(`${baseUrl}/v1/tickets`, {
+			method: 'PUT',
+		})
+
+		assert.equal(response.status, 405)
+		assert.equal(response.headers.get('allow'), 'GET, POST')
+	})
 })
