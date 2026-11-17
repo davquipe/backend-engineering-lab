@@ -20,3 +20,4 @@ npm test
 ## HTTP endpoints
 
 GET /health - Service health
+GET /v1/info - Service metadata
