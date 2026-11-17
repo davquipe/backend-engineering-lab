@@ -50,6 +50,12 @@ test('HTTP API contract', async (t) => {
 		const response = await fetch(`${baseUrl}/v1/info`)
 
 		assert.equal(response.status, 200)
+
+		assert.match(
+			response.headers.get('content-type') ?? '',
+			/^application\/json(?:;|$)/i,
+		)
+
 		assert.deepEqual(await response.json(), {
 			name: 'serviceops-api',
 			version: '1.0.0',
